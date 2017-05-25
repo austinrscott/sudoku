@@ -18,8 +18,6 @@ TEST_STRING_1 = '0' * 81
 TEST_STRING_2 = '123' + '0' * 6 + '456' + '0' * 6 + '789' + '0' * 60
 TEST_STRING_3 = gen_test_string_3()
 
-print('\n'.join(TEST_STRING_3[i:i + 9] for i in range(0, 80, 9)))
-
 
 class TestBoardInit(TestCase):
     def test_init_no_params(self):
