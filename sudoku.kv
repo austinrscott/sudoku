@@ -1,1 +1,64 @@
 #:kivy 1.9.1
+#:import random random.random
+
+# The width in px of the button bar on the side/bottom of the screen
+#:set bb_width 90
+
+# This Class Rule only exists for debugging. It puts a dashed line around every widget.
+<Widget>:
+    canvas.after:
+        Line:
+            rectangle: self.x + 1, self.y + 1, self.width - 1, self.height - 1
+            dash_offset: 5
+            dash_length: 3
+
+<GameTable>:
+    id: table
+    orientation: 'vertical' if self.height > self.width else 'horizontal'
+    Widget:
+        Grid:
+            size: self.get_grid_size((table.width, table.height, table.orientation), bb_width)
+    BoxLayout:
+        id: button_bar
+        orientation: 'vertical' if table.orientation == 'horizontal' else 'horizontal'
+        size_hint: (None, None)
+        size: (bb_width, table.height) if table.orientation == 'horizontal' else (table.width, bb_width)
+        spacing: 10
+        LgButton:
+            text: 'New Game'
+        LgButton:
+            text: 'Rules'
+        LgButton:
+            text: 'Solver'
+        LgButton:
+            text: 'Quit'
+            on_touch_down: app.stop()
+
+<LgButton@Widget>:
+    text: ''
+    Button:
+        center: self.parent.center
+        size_hint: (None, None)
+        size: (70, 70)
+        text: root.text
+
+<Grid>:
+    id: grid
+    cols: self.board.lensides
+    rows: self.board.lensides
+    size_hint: (None, None)
+    center: self.parent.center
+
+<Cell>:
+    canvas.before:
+        Color:
+            hsv: .4, .8, .5
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    Label:
+        size: self.parent.size
+        bold: True
+        font_size: 24
+        center: self.parent.center
+        text: self.parent.value

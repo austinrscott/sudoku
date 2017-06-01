@@ -1,17 +1,46 @@
 import kivy
 from kivy.app import App
-from kivy.uix.label import Label
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.widget import Widget
 
 from board import Board
 
 kivy.require('1.9.1')
 
 
+class Cell(Widget):
+    def __init__(self, board, char, **kwargs):
+        self._b = board
+        self.value = char
+        super().__init__(**kwargs)
+
+
+class Grid(GridLayout):
+    def __init__(self, **kwargs):
+        self.board = Board()
+        super().__init__(**kwargs)
+        for c in self.board.cells:
+            self.add_widget(Cell(self.board, c))
+
+    def get_grid_size(self, table, button_bar_width):
+        w, h, orientation = table
+        long, short = (w, h) if orientation == 'horizontal' else (h, w)
+        if long <= short + button_bar_width:
+            mid = long - button_bar_width
+            return (mid, mid)
+        else:
+            return (short, short)
+
+
+class GameTable(BoxLayout):
+    pass
+
+
 class SudokuApp(App):
     def build(self):
-        return Label(text="Testing")
+        return GameTable()
 
 
 if __name__ == '__main__':
-    board = Board('123456789789123456456789123912345678678912345345678912891234567567891234234567891')
     SudokuApp().run()
