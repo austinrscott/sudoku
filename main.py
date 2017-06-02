@@ -1,15 +1,15 @@
 import kivy
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.widget import Widget
 
 from board import Board
 
 kivy.require('1.9.1')
 
 
-class Cell(Widget):
+class Cell(Button):
     def __init__(self, board, char, **kwargs):
         self._b = board
         self.value = char

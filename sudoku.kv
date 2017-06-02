@@ -24,23 +24,25 @@
         size_hint: (None, None)
         size: (bb_width, table.height) if table.orientation == 'horizontal' else (table.width, bb_width)
         spacing: 10
-        LgButton:
-            text: 'New Game'
-        LgButton:
-            text: 'Rules'
-        LgButton:
-            text: 'Solver'
-        LgButton:
-            text: 'Quit'
-            on_touch_down: app.stop()
+        Widget:
+			LgButton:
+                text: 'New Game'
+        Widget:
+			LgButton:
+                text: 'Rules'
+        Widget:
+			LgButton:
+                text: 'Solver'
+        Widget:
+			LgButton:
+                text: 'Quit'
+                on_press: app.stop()
 
-<LgButton@Widget>:
+<LgButton@Button>:
     text: ''
-    Button:
-        center: self.parent.center
-        size_hint: (None, None)
-        size: (70, 70)
-        text: root.text
+    center: self.parent.center
+    size_hint: (None, None)
+    size: (70, 70)
 
 <Grid>:
     id: grid
