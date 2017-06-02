@@ -5,12 +5,12 @@
 #:set bb_width 90
 
 # This Class Rule only exists for debugging. It puts a dashed line around every widget.
-<Widget>:
-    canvas.after:
-        Line:
-            rectangle: self.x + 1, self.y + 1, self.width - 1, self.height - 1
-            dash_offset: 5
-            dash_length: 3
+#<Widget>:
+#    canvas.after:
+#        Line:
+#            rectangle: self.x + 1, self.y + 1, self.width - 1, self.height - 1
+#            dash_offset: 5
+#            dash_length: 3
 
 <GameTable>:
     id: table
@@ -52,15 +52,6 @@
     center: self.parent.center
 
 <Cell>:
-    canvas.before:
-        Color:
-            hsv: .4, .8, .5
-        Rectangle:
-            size: self.size
-            pos: self.pos
-    Label:
-        size: self.parent.size
-        bold: True
-        font_size: 24
-        center: self.parent.center
-        text: self.parent.value
+    bold: True
+    font_size: 24
+    text: self.value
