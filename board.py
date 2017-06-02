@@ -92,7 +92,7 @@ class Board(object):
 
     @classmethod
     def idx_to_xy(cls, idx):
-        return idx % cls._lensides + (idx // cls._lensides) * 9
+        return idx % cls._lensides, (idx // cls._lensides)
 
     def __str__(self):
         return self.string
