@@ -3,49 +3,77 @@
 
 # The width in px of the button bar on the side/bottom of the screen
 #:set bb_width 90
-
-# This Class Rule only exists for debugging. It puts a dashed line around every widget.
-#<Widget>:
-#    canvas.after:
-#        Line:
-#            rectangle: self.x + 1, self.y + 1, self.width - 1, self.height - 1
-#            dash_offset: 5
-#            dash_length: 3
+<Shade>:
+    background_normal: ''
+    canvas:
+        Color:
+            rgba: .4, .4, .4, .3
+        Rectangle:
+            size: self.size
+            pos: self.pos
 
 <GameTable>:
+    canvas.before:
+        Color:
+            rgb: 1, 1, 1
+        Rectangle:
+            pos: table.pos
+            size: table.size
     id: table
-    orientation: 'vertical' if self.height > self.width else 'horizontal'
-    Widget:
-        Grid:
-            size: self.get_grid_size((table.width, table.height, table.orientation), bb_width)
+    orientation: tablebox.orientation
+
     BoxLayout:
-        id: button_bar
-        orientation: 'vertical' if table.orientation == 'horizontal' else 'horizontal'
-        size_hint: (None, None)
-        size: (bb_width, table.height) if table.orientation == 'horizontal' else (table.width, bb_width)
-        spacing: 10
-        Widget:
-			LgButton:
-                text: 'New Game'
-        Widget:
-			LgButton:
-                text: 'Rules'
-        Widget:
-			LgButton:
-                text: 'Solver'
-        Widget:
-			LgButton:
-                text: 'Quit'
-                on_press: app.stop()
+        id: tablebox
+        orientation: 'vertical' if self.height > self.width else 'horizontal'
+        GridSpace:
+            Grid:
+                table: table
+                center: self.parent.center
+                size: self.get_grid_size((table.width, table.height, table.orientation), bb_width)
+
+        BoxLayout:
+            id: button_bar
+            orientation: 'vertical' if table.orientation == 'horizontal' else 'horizontal'
+            size_hint: (None, None)
+            size: (bb_width, table.height) if table.orientation == 'horizontal' else (table.width, bb_width)
+            spacing: 10
+            Widget:
+                LgButton:
+                    text: 'New Game'
+            Widget:
+                LgButton:
+                    text: 'Rules'
+            Widget:
+                LgButton:
+                    text: 'Solver'
+            Widget:
+                LgButton:
+                    text: 'Quit'
+                    on_press: app.stop()
+
+<NumPad>:
+    orientation: 'vertical'
+    size_hint: (None, None)
+    size: (self.cur_cell.size[0] * 3, self.cur_cell.size[0] * 4)
+
+<NumKey>:
+    size_hint: (None, None)
+    size: (60, 60)
+    font_size: 24
+
+<SpaceKey>:
+    size_hint: (None, None)
+    size: (180, 60)
 
 <LgButton@Button>:
     text: ''
+    background_normal: ''
+    color: 0, 0, 0, 1
     center: self.parent.center
     size_hint: (None, None)
     size: (70, 70)
 
 <Grid>:
-    id: grid
     cols: self.board.lensides
     rows: self.board.lensides
     size_hint: (None, None)
@@ -53,5 +81,7 @@
 
 <Cell>:
     bold: True
-    font_size: 24
+    color: 0, 0, 0, 1
+    background_normal: ''
     text: self.value
+    on_press: self.clicked()
