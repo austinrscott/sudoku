@@ -14,19 +14,6 @@ from board import Board
 kivy.require('1.9.1')
 
 
-class Cell(Button):
-    table = ObjectProperty(None)
-
-    def __init__(self, xy, char, table, **kwargs):
-        self.xy = xy
-        self.value = char
-        super().__init__(**kwargs)
-        self.table = table
-
-    def clicked(self):
-        self.table.popup(NumPad(target_cell=self))
-
-
 class NumKey(Button):
     pass
 
@@ -46,8 +33,41 @@ class NumPad(Bubble):
         self.add_widget(SpaceKey(text='_'))
 
 
+class Shade(Button):
+    pass
+
+
+class GameTable(FloatLayout):
+    shade = ObjectProperty(Shade())
+    orientation = StringProperty('')
+    cur_popup = ObjectProperty(None)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def on_numpad_popup(self, cell):
+        self.add_widget(self.shade)
+        self.cur_popup = NumPad(center=self.center)
+        self.add_widget(self.cur_popup)
+
+    def on_numpad_close(self):
+        self.remove_widget(self.cur_popup)
+        self.remove_widget(self.shade)
+        self.cur_popup = None
+
+
 class GridSpace(Widget):
     pass
+
+
+class Cell(Button):
+    value = StringProperty('')
+
+    def __init__(self, xy, char, **kwargs):
+        self.xy = xy
+        self.value = char
+        super().__init__(**kwargs)
+
 
 class Grid(GridLayout):
     table = ObjectProperty(None)
@@ -56,7 +76,7 @@ class Grid(GridLayout):
         self.board = Board()
         super().__init__(**kwargs)
         for i, c in enumerate(self.board.cells):
-            widget = Cell(self.board.idx_to_xy(i), c, self.table)
+            widget = Cell(self.board.idx_to_xy(i), c)
             self.add_widget(widget)
         with self.canvas:
             Color(0, 0, 0)
@@ -89,28 +109,10 @@ class Grid(GridLayout):
             return short, short
 
 
-class Shade(Button):
-    pass
-
-
-class GameTable(FloatLayout):
-    shade = ObjectProperty(Shade())
-    orientation = StringProperty('')
-    cur_popup = ObjectProperty(None)
-
-    def popup(self, widget, cutout=None, clickaway=None):
-        self.add_widget(self.shade)
-        self.add_widget(widget)
-        self.cur_popup = widget
-
-    def clear_popup(self):
-        self.remove_widget(self.cur_popup)
-        self.remove_widget(self.shade)
-        self.cur_popup = None
-
 class SudokuApp(App):
     def build(self):
-        return GameTable()
+        game_table = GameTable()
+        return game_table
 
 
 if __name__ == '__main__':

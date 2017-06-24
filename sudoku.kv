@@ -83,5 +83,5 @@
     bold: True
     color: 0, 0, 0, 1
     background_normal: ''
-    text: self.value
-    on_press: self.clicked()
+    text: self.value if not self.value == '0' else ''
+    on_press: self.dispatch('on_numpad_popup', self)
