@@ -14,46 +14,51 @@ from board import Board
 kivy.require('1.9.1')
 
 
-class NumKey(Button):
+class NumPadKey(Button):
     pass
 
 
-class SpaceKey(NumKey):
+class SpaceKey(NumPadKey):
     pass
-
 
 class NumPad(Bubble):
-    def __init__(self, **kwargs):
+    cur_cell = ObjectProperty(None)
+
+    def __init__(self, init_cell, **kwargs):
         super().__init__(**kwargs)
         self.numgrid = GridLayout(cols=3, spacing=0)
+        init_cell.bind(size=self.resize)
 
         for i in range(1, 10):
-            self.numgrid.add_widget(NumKey(text=str(i)))
+            self.numgrid.add_widget(NumPadKey(text=str(i)))
         self.add_widget(self.numgrid)
         self.add_widget(SpaceKey(text='_'))
 
+    def resize(self, instance, new_size):
+        w, h = new_size
+        self.size = (w * 3, h * 4)
 
-class Shade(Button):
-    pass
+    def focus(self, cell):
+        self.cur_cell = cell
+        self.center = cell.center
 
 
 class GameTable(FloatLayout):
-    shade = ObjectProperty(Shade())
     orientation = StringProperty('')
-    cur_popup = ObjectProperty(None)
+    numpad = ObjectProperty(None)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        for cell in self.ids.grid.children:
+            cell.bind(on_press=self.numpad_popup)
+        self.numpad = NumPad(self.ids.grid.children[0])
 
-    def on_numpad_popup(self, cell):
-        self.add_widget(self.shade)
-        self.cur_popup = NumPad(center=self.center)
-        self.add_widget(self.cur_popup)
+    def numpad_popup(self, cell):
+        self.numpad.focus(cell)
+        self.add_widget(self.numpad)
 
     def on_numpad_close(self):
-        self.remove_widget(self.cur_popup)
-        self.remove_widget(self.shade)
-        self.cur_popup = None
+        self.remove_widget(self.numpad)
 
 
 class GridSpace(Widget):
@@ -63,7 +68,8 @@ class GridSpace(Widget):
 class Cell(Button):
     value = StringProperty('')
 
-    def __init__(self, xy, char, **kwargs):
+    def __init__(self, idx, xy, char, **kwargs):
+        self.idx = idx
         self.xy = xy
         self.value = char
         super().__init__(**kwargs)
@@ -73,10 +79,10 @@ class Grid(GridLayout):
     table = ObjectProperty(None)
 
     def __init__(self, **kwargs):
-        self.board = Board()
+        self.board = Board('1' + '0' * 80)
         super().__init__(**kwargs)
         for i, c in enumerate(self.board.cells):
-            widget = Cell(self.board.idx_to_xy(i), c)
+            widget = Cell(i, self.board.idx_to_xy(i), c)
             self.add_widget(widget)
         with self.canvas:
             Color(0, 0, 0)

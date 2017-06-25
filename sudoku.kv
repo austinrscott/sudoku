@@ -4,13 +4,7 @@
 # The width in px of the button bar on the side/bottom of the screen
 #:set bb_width 90
 <Shade>:
-    background_normal: ''
-    canvas:
-        Color:
-            rgba: .4, .4, .4, .3
-        Rectangle:
-            size: self.size
-            pos: self.pos
+    background_color: .4, .4, .4, .2
 
 <GameTable>:
     canvas.before:
@@ -28,6 +22,7 @@
         GridSpace:
             Grid:
                 table: table
+                id: grid
                 center: self.parent.center
                 size: self.get_grid_size((table.width, table.height, table.orientation), bb_width)
 
@@ -54,16 +49,12 @@
 <NumPad>:
     orientation: 'vertical'
     size_hint: (None, None)
-    size: (self.cur_cell.size[0] * 3, self.cur_cell.size[0] * 4)
 
-<NumKey>:
-    size_hint: (None, None)
-    size: (60, 60)
-    font_size: 24
+<NumPadKey>:
+    size_hint: (1/3, 0.25)
 
 <SpaceKey>:
-    size_hint: (None, None)
-    size: (180, 60)
+    size_hint: (1, 0.25)
 
 <LgButton@Button>:
     text: ''
@@ -84,4 +75,3 @@
     color: 0, 0, 0, 1
     background_normal: ''
     text: self.value if not self.value == '0' else ''
-    on_press: self.dispatch('on_numpad_popup', self)
