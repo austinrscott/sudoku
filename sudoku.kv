@@ -3,9 +3,6 @@
 
 # The width in px of the button bar on the side/bottom of the screen
 #:set bb_width 90
-<Shade>:
-    background_color: .4, .4, .4, .2
-
 <GameTable>:
     canvas.before:
         Color:
@@ -49,6 +46,7 @@
 <NumPad>:
     orientation: 'vertical'
     size_hint: (None, None)
+    center: self._recenter(self.cur_cell)
 
 <NumPadKey>:
     size_hint: (1/3, 0.25)
