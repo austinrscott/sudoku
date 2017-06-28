@@ -24,11 +24,11 @@ class NumPadKey(Button):
     def __init__(self, value, **kwargs):
         self.text = value
         self.value = value
-        super().__init__(**kwargs)
+        super(NumPadKey, self).__init__(**kwargs)
 
 class SpaceKey(NumPadKey):
     def __init__(self, **kwargs):
-        super().__init__(value='0', text='', **kwargs)
+        super(SpaceKey, self).__init__(value='0', text='', **kwargs)
 
 
 class NumPad(Bubble):
@@ -36,7 +36,7 @@ class NumPad(Bubble):
     last_press = StringProperty('')
 
     def __init__(self, init_cell, **kwargs):
-        super().__init__(**kwargs)
+        super(NumPad, self).__init__(**kwargs)
         self.numgrid = GridLayout(cols=3, spacing=0)
         init_cell.bind(size=self._resize)
 
@@ -92,7 +92,7 @@ class GameTable(FloatLayout):
     shade = ObjectProperty(None)
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(GameTable, self).__init__(**kwargs)
         self.shade = Factory.Shade()
         for cell in self.ids.grid.children:
             cell.bind(on_press=self.numpad_popup)
@@ -121,7 +121,7 @@ class Cell(Button):
         self.idx = idx
         self.xy = xy
         self.value = char
-        super().__init__(**kwargs)
+        super(Cell, self).__init__(**kwargs)
 
 
 class Grid(GridLayout):
@@ -129,7 +129,7 @@ class Grid(GridLayout):
 
     def __init__(self, **kwargs):
         self.board = Board('1' + '0' * 80)
-        super().__init__(**kwargs)
+        super(Grid, self).__init__(**kwargs)
         for i, c in enumerate(self.board.cells):
             cell = Factory.Cell(i, self.board.idx_to_xy(i), c)
             cell.bind(value=self._value_changed)
