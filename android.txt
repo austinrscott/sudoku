@@ -1,0 +1,3 @@
+title='Sudoku'
+author='Austin R. Scott'
+orientation='portrait'
