@@ -31,27 +31,6 @@ class SpaceKey(NumPadKey):
         super().__init__(value='0', text='', **kwargs)
 
 
-def numpad_refocus(numpad, cell, **kwargs):
-    x, y = cell.xy
-
-    # NOTE: Sudoku board is (0,0) in the top-left but Kivy is (0,0) in the bottom-right. Inverted Y axis
-    cell_h_align = cell.x if x >= 4 else cell.right
-    cell_v_align = cell.y if y >= 4 else cell.top
-    np_arrow_pos = '{}_{}'.format('right' if x >= 4 else 'left', 'bottom' if y >= 4 else 'top')
-
-    if x >= 4:
-        numpad.right = cell_h_align
-    else:
-        numpad.x = cell_h_align
-
-    if y >= 4:
-        numpad.y = cell_v_align
-    else:
-        numpad.top = cell_v_align
-
-    numpad.arrow_pos = np_arrow_pos
-
-
 class NumPad(Bubble):
     cur_cell = ObjectProperty(None)
     last_press = StringProperty('')
@@ -60,7 +39,6 @@ class NumPad(Bubble):
         super().__init__(**kwargs)
         self.numgrid = GridLayout(cols=3, spacing=0)
         init_cell.bind(size=self._resize)
-        self.bind(cur_cell=numpad_refocus)
 
         for i in range(1, 10):
             numpadkey = Factory.NumPadKey(value=str(i))
@@ -72,10 +50,6 @@ class NumPad(Bubble):
         spacekey.bind(on_press=functools.partial(self._pressed, spacekey))
         self.add_widget(spacekey)
 
-    def _pressed(self, key, *args, **kwargs):
-        self.last_press = key.value
-        if self.cur_cell:
-            self.cur_cell.value = key.value
 
     def _resize(self, instance, new_size):
         w, h = new_size
@@ -83,6 +57,29 @@ class NumPad(Bubble):
 
     def focus(self, cell):
         self.cur_cell = cell
+        x, y = cell.xy
+
+        # NOTE: Sudoku board is (0,0) in the top-left but Kivy is (0,0) in the bottom-right. Inverted Y axis
+        cell_h_align = cell.x if x >= 4 else cell.right
+        cell_v_align = cell.y if y >= 4 else cell.top
+        np_arrow_pos = '{}_{}'.format('right' if x >= 4 else 'left', 'bottom' if y >= 4 else 'top')
+
+        if x >= 4:
+            self.right = cell_h_align
+        else:
+            self.x = cell_h_align
+
+        if y >= 4:
+            self.y = cell_v_align
+        else:
+            self.top = cell_v_align
+
+        self.arrow_pos = np_arrow_pos
+
+    def _pressed(self, key, *args, **kwargs):
+        self.last_press = key.value
+        if self.cur_cell:
+            self.cur_cell.value = key.value
 
 
 class Shade(ButtonBehavior, Widget):
