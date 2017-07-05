@@ -1,9 +1,42 @@
 #:kivy 1.9.1
 #:import random random.random
 #:import Clock kivy.clock.Clock
+#:import Factory kivy.factory
 
 # The width in px of the button bar on the side/bottom of the screen
 #:set bb_width 90
+<PopupText@Label>:
+    color: 0, 0, 0, 1
+    halign: 'center'
+    valign: 'middle'
+
+<PopupSlider@Slider+FloatLayout>:
+    title: ''
+    PopupText:
+        text: root.title
+        pos_hint: {'center': (.5, .825)}
+    PopupText:
+        text: str(int(root.value // 1))
+        pos_hint: {'center': (.5, .675)}
+        font_size: 24
+
+<PopupWindow@BoxLayout+ButtonBehavior>:
+    size_hint: .9, .9
+    pos_hint: {'center': (.5, .5)}
+    orientation: 'vertical'
+    padding: 20
+    canvas:
+        Color:
+            rgb: .95, .95, .95
+        Rectangle:
+            size: root.size
+            pos: root.pos
+
+        Color:
+            rgb: 0, 0, 0
+        Line:
+            rectangle: self.x, self.y, self.width, self.height
+
 <GameTable>:
     canvas.before:
         Color:
@@ -13,6 +46,22 @@
             size: table.size
     id: table
     orientation: tablebox.orientation
+    ng_dialog: ng_dialog
+
+    PopupWindow:
+        id: ng_dialog
+        PopupText:
+            text: 'New Puzzle'
+            size_hint_y: .1
+        PopupSlider:
+            id: nb
+            title: 'Number of Blanks'
+            min: 1
+            max: 81
+            value: 40
+        Button:
+            text: 'Generate Puzzle'
+            on_press: grid.generate(nb.value // 1)
 
     BoxLayout:
         id: tablebox
@@ -33,6 +82,7 @@
             Widget:
                 LgButton:
                     text: 'New Game'
+                    on_press: table.ng_popup()
             Widget:
                 LgButton:
                     text: 'Rules'

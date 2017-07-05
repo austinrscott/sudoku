@@ -1,11 +1,12 @@
 import functools
+from random import choice
 
 import kivy
 from kivy.app import App
 from kivy.factory import Factory
 from kivy.graphics.context_instructions import Color
 from kivy.graphics.vertex_instructions import Line
-from kivy.properties import ObjectProperty, StringProperty
+from kivy.properties import ObjectProperty, StringProperty, DictProperty, Clock
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.bubble import Bubble
 from kivy.uix.button import Button
@@ -16,7 +17,6 @@ from kivy.uix.widget import Widget
 from board import Board
 
 kivy.require('1.9.1')
-
 
 class NumPadKey(Button):
     value = StringProperty('')
@@ -90,6 +90,7 @@ class GameTable(FloatLayout):
     orientation = StringProperty('')
     numpad = ObjectProperty(None)
     shade = ObjectProperty(None)
+    ng_dialog = ObjectProperty(None)
 
     def __init__(self, **kwargs):
         super(GameTable, self).__init__(**kwargs)
@@ -97,16 +98,28 @@ class GameTable(FloatLayout):
         for cell in self.ids.grid.children:
             cell.bind(on_press=self.numpad_popup)
         self.numpad = Factory.NumPad(self.ids.grid.children[0])
-        self.shade.bind(on_press=self.numpad_close)
         self.numpad.bind(last_press=self.numpad_close)
+        self.remove_widget(self.ng_dialog)
 
-    def numpad_popup(self, cell):
+    def ng_popup(self, *args, **kwargs):
+        self.add_widget(self.shade)
+        self.add_widget(self.ng_dialog)
+        self.shade.bind(on_press=self.ng_close)
+
+    def ng_close(self, *args, **kwargs):
+        self.remove_widget(self.shade)
+        self.shade.unbind(on_press=self.ng_close)
+        self.remove_widget(self.ng_dialog)
+
+    def numpad_popup(self, cell, *args, **kwargs):
         self.numpad.focus(cell)
         self.add_widget(self.shade)
         self.add_widget(self.numpad)
+        self.shade.bind(on_press=self.numpad_close)
 
     def numpad_close(self, *args, **kwargs):
         self.remove_widget(self.numpad)
+        self.shade.unbind(on_press=self.numpad_close)
         self.remove_widget(self.shade)
 
 
@@ -126,14 +139,17 @@ class Cell(Button):
 
 class Grid(GridLayout):
     table = ObjectProperty(None)
+    cells = DictProperty({})
 
     def __init__(self, **kwargs):
-        self.board = Board('1' + '0' * 80)
+        self.board = Board('0' * 81)
         super(Grid, self).__init__(**kwargs)
         for i, c in enumerate(self.board.cells):
-            cell = Factory.Cell(i, self.board.idx_to_xy(i), c)
+            xy = self.board.idx_to_xy(i)
+            cell = Factory.Cell(i, xy, c)
             cell.bind(value=self._value_changed)
             self.add_widget(cell)
+            self.cells[xy] = cell
         with self.canvas:
             Color(0, 0, 0)
             self.lines_h = [Line() for _ in range(8)]
@@ -141,9 +157,29 @@ class Grid(GridLayout):
         self.redraw()
         self.bind(pos=self.redraw, size=self.redraw)
 
+    def new_board(self):
+        self.board = Board()
+        for cell in self.cells.values():
+            cell.value = '0'
+
+    def generate(self, number_of_blanks):
+        print("Generating a board with {} blanks on it.".format(int(number_of_blanks)))
+        self.table.ng_close()
+
+        self.new_board()
+
+        for i in range(81 - int(number_of_blanks)):
+            Clock.schedule_once(self.pick_new_value, 0.2 * i)
+
+    def pick_new_value(self, *args, **kwargs):
+        blanks = list(self.board.blanks.items())
+        blanks.sort(key=lambda x: x[1])
+        xy, pv = blanks[0]
+        value = choice(list(pv))
+        self.cells[xy].value = value
+
     def _value_changed(self, cell, new_value):
         self.board[cell.xy] = new_value
-        print(self.board)
 
     def redraw(self, *args):
         x, y, top, right, cell_width = self.x, self.y, self.top, self.right, self.width / 9
