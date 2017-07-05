@@ -50,6 +50,29 @@ class Board(object):
             blank_xys |= row.blanks
         return {xy: self.pv_at_xy(xy) for xy in blank_xys}
 
+    @property
+    def blanks_by_pv(self):
+        result = {}
+        for xy, pv in self.blanks.items():
+            if not len(pv) in result.keys():
+                result[len(pv)] = [(xy, pv)]
+            else:
+                result[len(pv)].append((xy, pv))
+        result = [[(xy, pv) for xy, pv in result[num_pv]] for num_pv in sorted(result.keys())]
+        return result
+
+    @property
+    def all_legal_moves(self):
+        return [(xy, value) for xy, pv in self.blanks.items() for value in pv]
+
+    @property
+    def lowest_pv(self):
+        return min(map(len, self.blanks.values()))
+
+    @property
+    def xy_of_lowest_pv(self):
+        return min(self.blanks.items(), key=lambda x: len(x[1]))
+
     def pv_at_xy(self, xy):
         column, row, square = self.groups_at_xy(xy)
         return column.pv & row.pv & square.pv
