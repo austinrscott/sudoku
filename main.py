@@ -1,4 +1,5 @@
-import functools
+from functools import partial
+from random import shuffle
 
 import kivy
 from kivy.app import App
@@ -14,7 +15,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.widget import Widget
 
 from board import Board
-from solver import Solver
+from solve import solve_one
 
 kivy.require('1.9.1')
 
@@ -44,12 +45,12 @@ class NumPad(Bubble):
 
         for i in range(1, 10):
             numpadkey = Factory.NumPadKey(value=str(i))
-            numpadkey.bind(on_press=functools.partial(self._pressed, numpadkey))
+            numpadkey.bind(on_press=partial(self._pressed, numpadkey))
             self.numgrid.add_widget(numpadkey)
         self.add_widget(self.numgrid)
 
         spacekey = SpaceKey()
-        spacekey.bind(on_press=functools.partial(self._pressed, spacekey))
+        spacekey.bind(on_press=partial(self._pressed, spacekey))
         self.add_widget(spacekey)
 
     def _resize(self, instance, new_size):
@@ -144,7 +145,6 @@ class Grid(GridLayout):
 
     def __init__(self, **kwargs):
         self.board = Board()
-        self.solver = Solver(board=self.board)
         super(Grid, self).__init__(**kwargs)
         for i, c in enumerate(self.board.cells):
             xy = self.board.idx_to_xy(i)
@@ -161,7 +161,6 @@ class Grid(GridLayout):
 
     def new_board(self):
         self.board = Board()
-        self.solver = Solver(board=self.board)
         for cell in self.cells.values():
             cell.value = '0'
 
@@ -171,14 +170,15 @@ class Grid(GridLayout):
 
         self.new_board()
 
-        solution = self.solver.find_solution()
+        solution = solve_one(self.board)
+        shuffle(solution)
 
-        for i in range(81 - int(number_of_blanks)):
-            xy, value = solution.pop(0)
-            Clock.schedule_once(functools.partial(self.fill, xy=xy, value=value), 0.05 * i)
+        for i in range(81 - number_of_blanks):
+            xy, value = solution[i]
+            Clock.schedule_once(partial(self.fill, xy, value), 2 + 0.05 * i)
 
     def fill(self, xy, value, *args, **kwargs):
-        self.cells[xy] = value
+        self.cells[xy].value = value
 
     def _value_changed(self, cell, new_value):
         self.board[cell.xy] = new_value

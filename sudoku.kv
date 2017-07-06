@@ -61,7 +61,7 @@
             value: 40
         Button:
             text: 'Generate Puzzle'
-            on_press: grid.generate(nb.value // 1)
+            on_press: grid.generate(int(nb.value // 1))
 
     BoxLayout:
         id: tablebox

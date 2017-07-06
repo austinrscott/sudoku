@@ -40,6 +40,14 @@ class Board(object):
         self._cells = list(value)
 
     @property
+    def complete(self):
+        return not self.blanks and not self.collisions
+
+    @property
+    def legal(self):
+        return not self.collisions and self.lowest_pv >= 1
+
+    @property
     def cells(self):
         return self._cells
 
