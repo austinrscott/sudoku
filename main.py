@@ -13,12 +13,16 @@ from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.widget import Widget
+from kivy.utils import platform
 
 from board import Board
 from solve import solve_one
 
 kivy.require('1.9.1')
 
+if platform == 'android':
+    wrappers = __import__('pyjnius-api-wrappers')
+    wrappers.orientation.set_no_preference()
 
 class NumPadKey(Button):
     value = StringProperty('')
