@@ -183,6 +183,10 @@ class Grid(GridLayout):
     def _value_changed(self, cell, new_value):
         self.board[cell.xy] = new_value
 
+        # TODO: Start implementing validation here probably
+        if self.board.collisions:
+            print("Collisions on the board: " + repr(self.board.collisions))
+
     def redraw(self, *args):
         x, y, top, right, cell_width = self.x, self.y, self.top, self.right, self.width / 9
         for i in range(8):
