@@ -132,10 +132,12 @@ class TestBoardCollisions(TestCase):
 
     def test_get_all_collisions_1(self):
         self.b[0, 0] = 9
-        self.assertSequenceEqual(self.b.collisions, {(0, 3), (8, 0), (2, 1), (0, 0)})
+        self.assertSequenceEqual(self.b.cells_colliding, {(0, 3), (8, 0), (2, 1), (0, 0)})
 
     def test_get_all_collisions_2(self):
-        self.assertSequenceEqual(self.b.collisions, set())
+        self.assertSequenceEqual(self.b.cells_colliding, set())
+
+        # TODO: Create a unit test for Board.groups_colliding
 
 
 if __name__ == "__main__":

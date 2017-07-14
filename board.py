@@ -41,11 +41,11 @@ class Board(object):
 
     @property
     def complete(self):
-        return not self.blanks and not self.collisions
+        return not self.blanks and not self.cells_colliding
 
     @property
     def legal(self):
-        return not self.collisions and self.lowest_pv >= 1
+        return not self.cells_colliding and self.lowest_pv >= 1
 
     @property
     def cells(self):
@@ -97,11 +97,15 @@ class Board(object):
         return (y // 3) * 3 + (x // 3)
 
     @property
-    def collisions(self):
+    def cells_colliding(self):
         ret = set()
         for group in self.groups:
             ret |= group.collisions
         return ret
+
+    @property
+    def groups_colliding(self):
+        return list(filter(lambda grp: grp.collisions, self.groups))
 
     @property
     def groups(self):
@@ -142,4 +146,4 @@ class Board(object):
 
     def __repr__(self):
         return "{} by {} Sudoku Board ({} blank, {})".format(self._lensides, self._lensides, self.blanks,
-                                                             "valid" if self.collisions else "invalid")
+                                                             "valid" if self.cells_colliding else "invalid")
