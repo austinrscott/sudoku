@@ -131,11 +131,13 @@ class GridSpace(Widget):
 
 class Cell(Button):
     value = StringProperty('')
+    collision_state = StringProperty('')
 
     def __init__(self, idx, xy, char, **kwargs):
         self.idx = idx
         self.xy = xy
         self.value = char
+        self.collision_state = 'normal'
         super(Cell, self).__init__(**kwargs)
 
 
@@ -145,6 +147,8 @@ class Grid(GridLayout):
 
     def __init__(self, **kwargs):
         self.board = Board()
+        self.cells_colliding = set()
+        self.groups_colliding = set()
         super(Grid, self).__init__(**kwargs)
         for i, c in enumerate(self.board.cells):
             xy = self.board.idx_to_xy(i)
@@ -183,9 +187,28 @@ class Grid(GridLayout):
     def _value_changed(self, cell, new_value):
         self.board[cell.xy] = new_value
 
-        # TODO: Start implementing validation here probably
-        if self.board.collisions:
-            print("Collisions on the board: " + repr(self.board.collisions))
+        # For quick abbreviation of these ugly variables,
+        # cc = "cells colliding" and cigc = "cells in groups colliding"
+        self_cc, board_cc = self.cells_colliding, self.board.cells_colliding
+        self_cigc = set([cell for group in self.groups_colliding for cell in group.cells])
+        board_cigc = set([cell for group in self.board.groups_colliding for cell in group.cells])
+
+        if self_cc != board_cc:
+            # These set manipulations are to ensure that we don't waste any time visiting a cell
+            # twice to change its GUI representation.
+            cc_gone, cc_added = self_cc - board_cc, board_cc - self_cc
+            cigc_gone, cigc_added = self_cigc - board_cigc, board_cigc - self_cigc
+            cc_gone, cigc_gone = cc_gone - cigc_added, cigc_gone - cc_added
+            cigc_added = cigc_added - cc_added
+            for xy in cc_gone | cigc_gone:
+                self.cells[xy].collision_state = 'normal'
+            for xy in cigc_added:
+                self.cells[xy].collision_state = 'group'
+            for xy in cc_added:
+                self.cells[xy].collision_state = 'cell'
+            self.cells_colliding = board_cc
+            self.groups_colliding = self.board.groups_colliding
+
 
     def redraw(self, *args):
         x, y, top, right, cell_width = self.x, self.y, self.top, self.right, self.width / 9
