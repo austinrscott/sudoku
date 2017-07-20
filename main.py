@@ -130,14 +130,13 @@ class GridSpace(Widget):
 
 
 class Cell(Button):
-    value = StringProperty('')
-    collision_state = StringProperty('')
+    value = StringProperty('0')
+    collision_state = StringProperty('normal')
 
     def __init__(self, idx, xy, char, **kwargs):
         self.idx = idx
         self.xy = xy
         self.value = char
-        self.collision_state = 'normal'
         super(Cell, self).__init__(**kwargs)
 
 

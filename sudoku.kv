@@ -127,4 +127,10 @@
     bold: True
     color: 0, 0, 0, 1
     background_normal: ''
+    on_collision_state:
+        new_color = None
+        if args[1] == 'normal': new_color = 1, 1, 1, 1
+        elif args[1] == 'group': new_color = .95, .95, .95, 1
+        elif args[1] == 'cell': new_color = 1, .4, .4, 1
+        args[0].background_color = new_color
     text: self.value if not self.value == '0' else ''
