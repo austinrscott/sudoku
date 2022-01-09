@@ -1,8 +1,11 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
     <GameMenu/>
-    <GameBoard/>
+    <GameBoard :ref="'board'"/>
+    <span v-for="[key, value] in Object.entries(debug)" :key="key">
+      <strong>{{ key }}</strong>
+      <span>{{ value }}</span>
+    </span>
   </div>
 </template>
 
@@ -15,6 +18,13 @@ export default {
   components: {
     GameBoard,
     GameMenu,
+  },
+  computed: {
+    debug() {
+      return {
+        test: this.$refs.board?.complete
+      }
+    }
   }
 }
 </script>

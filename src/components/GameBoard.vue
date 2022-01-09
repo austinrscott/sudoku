@@ -1,49 +1,75 @@
 <template>
   <div class="board">
-    <div v-for="(cell, index) in allCells"
-         :data-row="getRow(index)"
-         :data-column="index % 9"
-         :class="{'board__cell': true, 'board__cell--expanded': expanded[0]}"
-         :key="`board-cell-${index}`"
-         style="{
-          'grid-column': getColumn(index),
-          'grid-row': getRow(index)
-         }"
-         @click="expand">
-      {{cell.value ? cell.value : ''}}
-    </div>
+    <GameCell v-for="(cell, index) in Object.values(board.cells)"
+              :data-row="cell.row"
+              :data-column="cell.column"
+              :key="`sudoku-cell-${index}`"
+              :cell="cell"
+              :id="index"
+              @cell:expand="handleCellExpand(index)"
+              :expanded="expanded !== null && expanded === index"
+              @change="handleCellChange"
+    />
   </div>
 </template>
 
 <script>
+import GameBoard from "@/models/gameBoard";
+import GameCell from "@/components/GameCell";
+
 export default {
   name: "GameBoard",
+  expose: ['board'],
+  components: {GameCell},
+  created() {
+    window.addEventListener('keydown', this.handleKeydown);
+  },
+  destroyed() {
+    window.removeEventListener('keydown', this.handleKeydown);
+  },
   methods: {
-    getRow(index) {
-      return Math.floor(index / 9);
+    handleKeydown(event) {
+      if (this.expanded !== null) {
+        switch (event.code) {
+          case 'ArrowUp':
+            this.handleCellExpand(Math.max(0, this.expanded - 9));
+            break;
+          case 'ArrowRight':
+            this.handleCellExpand(Math.min(81, this.expanded + 1));
+            break;
+          case 'ArrowDown':
+            this.handleCellExpand(Math.min(81, this.expanded + 9));
+            break;
+          case 'ArrowLeft':
+            this.handleCellExpand(Math.max(1, this.expanded - 1));
+            break;
+          case 'Enter':
+            this.expanded = null;
+            break;
+          default:
+            if (['Digit', 'Numpad'].some(prefix => event.code.startsWith(prefix)) && parseInt(event.code.at(-1)) > 0) {
+              this.handleCellChange(this.expanded, event.key);
+            }
+            break;
+        }
+      }
     },
-    getColumn(index) {
-      return index % 9;
+    handleCellExpand(id) {
+      this.expanded = id;
+      window.addEventListener('click', () => this.expanded = null);
     },
-    expand(event) {
-      this.expanded = [event.target.dataset.row, event.target.dataset.column];
+    handleCellChange(id, value) {
+      const row = Math.floor(id / 9);
+      const column = id % 9;
+      this.board.updateCell({row, column, value})
     }
   },
   data() {
     return {
-      board: Array(9).fill(Array(9).fill(0)),
+      board: GameBoard(),
       expanded: null
     }
   },
-  computed: {
-    allCells() {
-      return this.board.reduce(
-        (array, line, row) => [
-          ...array,
-          ...line.map((value, column) => ({value, row, column}))
-        ], []);
-    }
-  }
 }
 </script>
 
@@ -54,24 +80,10 @@ export default {
   display: grid;
   grid: repeat(9, var(--cell-size)) / repeat(9, var(--cell-size));
   justify-content: center;
+  perspective: 200px;
 }
 
-.board__cell {
-  border: 1px solid lightgray;
-  width: var(--cell-size);
-  height: var(--cell-size);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.board__cell--expanded {
-  outline: 1px red solid;
-}
-
-.board__cell:hover {
-  background-color: #ffd;
-  box-shadow: inset 5px 5px black;
+.board >>> [data-row="2"]:after, [data-row="5"]:after {
+  border-bottom: 2px black solid;
 }
 </style>
