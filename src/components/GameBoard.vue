@@ -10,6 +10,10 @@
               :expanded="expanded !== null && expanded === index"
               @change="handleCellChange"
     />
+    <div class="board__row-divider" :style="{gridArea: '4 / 1'}"/>
+    <div class="board__row-divider" :style="{gridArea: '7 / 1'}"/>
+    <div class="board__column-divider" :style="{gridArea: '1 / 4'}"/>
+    <div class="board__column-divider" :style="{gridArea: '1 / 7'}"/>
   </div>
 </template>
 
@@ -76,14 +80,29 @@ export default {
 <style scoped>
 .board {
   --cell-size: 25px;
+  --cell-gap: 2px;
+  --divider-width: 3px;
 
   display: grid;
   grid: repeat(9, var(--cell-size)) / repeat(9, var(--cell-size));
+  gap: var(--cell-gap);
   justify-content: center;
   perspective: 200px;
 }
 
-.board >>> [data-row="2"]:after, [data-row="5"]:after {
-  border-bottom: 2px black solid;
+.board__row-divider {
+  content: " ";
+  display: block;
+  background-color: black;
+  height: var(--divider-width);
+  width: calc(9 * var(--cell-size) + 8 * var(--cell-gap));
+}
+
+.board__column-divider {
+  content: " ";
+  display: block;
+  background-color: black;
+  width: var(--divider-width);
+  height: calc(9 * var(--cell-size) + 8 * var(--cell-gap));
 }
 </style>

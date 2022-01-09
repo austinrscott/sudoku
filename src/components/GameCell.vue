@@ -28,8 +28,9 @@ export default {
 </script>
 
 <style scoped>
-
 .board__cell {
+  --select-color: #eef;
+
   border: 1px solid lightgray;
   background-color: white;
 
@@ -50,11 +51,13 @@ export default {
 
 .board__cell--expanded {
   transform: translateZ(25px);
+  background-color: var(--select-color);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
   z-index: 5;
 }
 
 .board__cell:hover {
-  background-color: #ffd;
+  background-color: var(--select-color);
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
 }
 </style>
