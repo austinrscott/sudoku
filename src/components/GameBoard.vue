@@ -10,6 +10,9 @@
               :expanded="expanded !== null && expanded === index"
               @change="handleCellChange"
     />
+    <div v-show="expanded !== null"
+         class="board__expanded-shadow"
+         :style="{gridArea: `${Math.floor(expanded / 9) + 1} / ${(expanded % 9) + 1}`}"/>
     <div class="board__row-divider" :style="{gridArea: '4 / 1'}"/>
     <div class="board__row-divider" :style="{gridArea: '7 / 1'}"/>
     <div class="board__column-divider" :style="{gridArea: '1 / 4'}"/>
@@ -107,5 +110,11 @@ export default {
   background-color: black;
   width: var(--divider-width);
   height: calc(9 * var(--cell-size) + 8 * var(--cell-gap));
+}
+
+.board__expanded-shadow {
+  grid-area: 5 / 9 / auto / auto;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 10px;
+  background-color: rgba(0, 0, 0, 0.2);
 }
 </style>
