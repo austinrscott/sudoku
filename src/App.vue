@@ -1,9 +1,9 @@
 <template>
   <div id="app">
     <GameMenu/>
-    <GameBoard :ref="'board'"/>
+    <GameBoard :board="board"/>
     <span v-for="[key, value] in Object.entries(debug)" :key="key">
-      <strong>{{ key }}</strong>
+      <strong>{{ key }}: </strong>
       <span>{{ value }}</span>
     </span>
   </div>
@@ -12,6 +12,7 @@
 <script>
 import GameMenu from "@/components/GameMenu";
 import GameBoard from "@/components/GameBoard";
+import Board from "@/models/gameBoard";
 
 export default {
   name: 'App',
@@ -19,10 +20,15 @@ export default {
     GameBoard,
     GameMenu,
   },
+  data() {
+    return {
+      board: Board(),
+    }
+  },
   computed: {
     debug() {
       return {
-        test: this.$refs.board?.complete
+        test: `${JSON.stringify(this.board.groups)}`
       }
     }
   }

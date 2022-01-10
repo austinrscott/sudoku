@@ -18,12 +18,16 @@
 </template>
 
 <script>
-import GameBoard from "@/models/gameBoard";
 import GameCell from "@/components/GameCell";
 
 export default {
   name: "GameBoard",
-  expose: ['board'],
+  props: {
+    board: {
+      type: Object,
+      required: true
+    },
+  },
   components: {GameCell},
   created() {
     window.addEventListener('keydown', this.handleKeydown);
@@ -70,7 +74,6 @@ export default {
   },
   data() {
     return {
-      board: GameBoard(),
       expanded: null
     }
   },
